@@ -69,6 +69,9 @@ public class SettingFragment extends BaseFragment {
     private static final int BUFFER_SIZE = 65536;
 
     // ── Permission launcher ───────────────────────────────────────────────────
+    private final ActivityResultLauncher<String> openDocumentedResult =
+            registerForActivityResult(new ActivityResultContracts.GetContent(), this::onVideoChoiseDone);
+
     private final ActivityResultLauncher<String[]> permissionResult =
             registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), result -> {
                 String perm = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
@@ -81,9 +84,6 @@ public class SettingFragment extends BaseFragment {
                     ToastUtils.showToast("Storage permission is required to select a video.");
                 }
             });
-
-    private final ActivityResultLauncher<String> openDocumentedResult =
-            registerForActivityResult(new ActivityResultContracts.GetContent(), this::onVideoChoiseDone);
 
     // ── Lifecycle ─────────────────────────────────────────────────────────────
     public void onVideoChoiseDone(Uri video) {
