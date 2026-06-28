@@ -14,7 +14,7 @@ public class RVAdapter<T> extends RecyclerView.Adapter<RVHolder<? extends Object
     }
 
     public interface ItemLongClickListener<T> {
-        boolean onItemLongClick(android.view.View view, T data, int position);
+        void onItemLongClick(android.view.View view, T data, int position);
     }
 
     private final Context mContext;
@@ -34,7 +34,7 @@ public class RVAdapter<T> extends RecyclerView.Adapter<RVHolder<? extends Object
     }
 
     public void setItems(List<T> items) {
-        mItems = items != null ? items : new ArrayList<>();
+        mItems = items != null ? new ArrayList<>(items) : new ArrayList<>();
         notifyDataSetChanged();
     }
 
@@ -42,12 +42,21 @@ public class RVAdapter<T> extends RecyclerView.Adapter<RVHolder<? extends Object
         return mItems;
     }
 
-    public void setItemClickListener(ItemClickListener<T> listener) {
+    public RVAdapter<T> setItemClickListener(ItemClickListener<T> listener) {
         this.mClickListener = listener;
+        return this;
     }
 
-    public void setItemLongClickListener(ItemLongClickListener<T> listener) {
+    public RVAdapter<T> setItemLongClickListener(ItemLongClickListener<T> listener) {
         this.mLongClickListener = listener;
+        return this;
+    }
+
+    public void replaceAt(int index, T item) {
+        if (index >= 0 && index < mItems.size()) {
+            mItems.set(index, item);
+            notifyItemChanged(index);
+        }
     }
 
     @NonNull
@@ -67,7 +76,10 @@ public class RVAdapter<T> extends RecyclerView.Adapter<RVHolder<? extends Object
             if (mClickListener != null) mClickListener.onItemClick(v, item, position);
         });
         holder.itemView.setOnLongClickListener(v -> {
-            if (mLongClickListener != null) return mLongClickListener.onItemLongClick(v, item, position);
+            if (mLongClickListener != null) {
+                mLongClickListener.onItemLongClick(v, item, position);
+                return true;
+            }
             return false;
         });
     }
